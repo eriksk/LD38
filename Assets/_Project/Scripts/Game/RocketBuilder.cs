@@ -11,13 +11,13 @@ public class RocketBuilder : MonoBehaviour
 
     private int _current = 0;
 
-    public bool TryAddObject(GameObject gameObject)
+    public bool TryAddObject(GameObject gameObject, Vector3 dropOffPoint)
     {
         if(_current == ExpectedOrderOfObjects.Count) return false; // Already added all!
 
         if(ExpectedOrderOfObjects[_current].name == gameObject.name)
         {
-            StartCoroutine(MoveObjectIntoPlace(gameObject));
+            StartCoroutine(MoveObjectIntoPlace(gameObject, dropOffPoint));
             _current++;
             return true;
         }
@@ -25,7 +25,7 @@ public class RocketBuilder : MonoBehaviour
         return false;
     }
 
-    private IEnumerator MoveObjectIntoPlace(GameObject gameObject)
+    private IEnumerator MoveObjectIntoPlace(GameObject gameObject, Vector3 dropOffPoint)
     {
         var target = HiddenRocketModel
             .Children()
@@ -47,24 +47,57 @@ public class RocketBuilder : MonoBehaviour
         
         for(var i = 0; i < handles.Length; i++)
             Destroy(handles[i].gameObject);
-            
 
-        var duration = 5f;
+
+        var it = MoveObject(
+            gameObject.transform,
+            gameObject.transform.position, 
+            gameObject.transform.rotation, 
+            dropOffPoint + Vector3.up * 14f, 
+            Quaternion.identity, 
+            1.5f);
+
+        while(it.MoveNext())
+            yield return it.Current;
+
+        it = MoveObject(
+            gameObject.transform,
+            gameObject.transform.position, 
+            gameObject.transform.rotation, 
+            target.transform.position + Vector3.up * 36f, 
+            target.transform.rotation, 
+            2f);
+
+        while(it.MoveNext())
+            yield return it.Current;
+
+        it = MoveObject(
+            gameObject.transform,
+            gameObject.transform.position, 
+            gameObject.transform.rotation, 
+            target.transform.position, 
+            target.transform.rotation, 
+            3f);
+
+        while(it.MoveNext())
+            yield return it.Current;
+
+        Debug.Log(gameObject.name + " moved into place!");
+    }
+
+    private IEnumerator MoveObject(Transform obj, Vector3 fromPosition, Quaternion fromRotation, Vector3 toPosition, Quaternion toRotation, float duration)
+    {
         var current = 0f;
-
-        var startPosition = gameObject.transform.position;
-        var startRotation = gameObject.transform.rotation;
 
         while(current <= duration)
         {
             yield return new WaitForEndOfFrame();
             var progress = current / duration;
 
-            gameObject.transform.position = Vector3.Lerp(startPosition, target.transform.position, progress);
-            gameObject.transform.rotation = Quaternion.Slerp(startRotation, target.transform.rotation, progress);
+            obj.position = Vector3.Lerp(fromPosition, toPosition, Mathf.SmoothStep(0f, 1f, progress));
+            obj.transform.rotation = Quaternion.Slerp(fromRotation, toRotation, progress);
 
             current += Time.deltaTime;
         }
-        Debug.Log(gameObject.name + " moved into place!");
     }
 }

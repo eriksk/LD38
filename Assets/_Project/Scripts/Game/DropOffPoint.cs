@@ -40,7 +40,7 @@ public class DropOffPoint : MonoBehaviour
         if(allHandlesOnObject.Any(x => x.Attached)) return;
         if(_handled.Contains(handle.Root.GetInstanceID())) return;
 
-        if(RocketBuilder.TryAddObject(handle.Root.gameObject))
+        if(RocketBuilder.TryAddObject(handle.Root.gameObject, transform.position))
         {
             Debug.Log("Added object to rocket builder: " + handle.Root.name);
             _handled.Add(handle.Root.GetInstanceID());
