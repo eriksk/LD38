@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class RobotController : MonoBehaviour 
 {
+	public RobotArm Arm;
+
 	public float Acceleration = 1f;
 	public float RotationSpeed = 0.1f;
 
@@ -23,6 +25,11 @@ public class RobotController : MonoBehaviour
 		if(Input.GetButton("Jump"))
 		{
 			_robot.Claws.Open();
+			Arm.GotoState(RobotArmState.Reach);
+		}
+		else
+		{
+			Arm.GotoState(RobotArmState.Idle);
 		}
 	}
 
@@ -30,15 +37,21 @@ public class RobotController : MonoBehaviour
 	{
 		var stick = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-		if(Mathf.Abs(stick.y) > 0.01f)
+		// if(Arm.CurrentState != RobotArmState.Reach) // Freeze when grabbing
 		{
-			_rigidbody.AddForce(transform.forward * stick.y * Acceleration / Time.deltaTime);
-		}
+			if(Mathf.Abs(stick.y) > 0.01f)
+			{
+				var moveSpeed = stick.y;
+				if(stick.y < 0f)
+					moveSpeed *= 0.3f; //  Slower backwards
+				_rigidbody.AddForce(transform.forward * moveSpeed * Acceleration / Time.deltaTime);
+			}
 
-		if(Mathf.Abs(stick.x) > 0.0f)
-		{	
-			var rotation = transform.rotation * Quaternion.Euler(0f, stick.x * RotationSpeed / Time.deltaTime, 0f);
-			_rigidbody.MoveRotation(rotation);
+			if(Mathf.Abs(stick.x) > 0.0f)
+			{	
+				var rotation = transform.rotation * Quaternion.Euler(0f, stick.x * RotationSpeed / Time.deltaTime, 0f);
+				_rigidbody.MoveRotation(rotation);
+			}
 		}
 
 		var velocity = _rigidbody.velocity;

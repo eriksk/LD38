@@ -7,6 +7,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class RobotClaws : MonoBehaviour 
 {
+    public RobotArm Arm;
 	public Transform LeftClaw;
 	public Transform RightClaw;
 
@@ -16,6 +17,21 @@ public class RobotClaws : MonoBehaviour
     public float OpenCloseSpeed = 0.1f;
     
     private bool _opening;
+
+    void Start()
+    {
+        Arm.StateChanged += ((state) => 
+        {
+            if(state != RobotArmState.Grabbing)
+            {
+                if(ObjectHandleInRangeOfGrabbing != null)
+                {
+                    ObjectHandleInRangeOfGrabbing.MarkAsOutOfRange();
+                    ObjectHandleInRangeOfGrabbing = null;
+                }
+            }
+        });
+    }
 
 	void Update () 
 	{
@@ -30,7 +46,8 @@ public class RobotClaws : MonoBehaviour
             }
             else
             {
-                Opened -= OpenCloseSpeed * Time.deltaTime;     
+                // Closing is faster
+                Opened -= OpenCloseSpeed * 2f * Time.deltaTime;     
                 Opened = Mathf.Clamp01(Opened);       
             }
         }
@@ -47,5 +64,38 @@ public class RobotClaws : MonoBehaviour
     public void Open()
     {
         _opening = true;
+    }
+
+    public GrabHandle ObjectHandleInRangeOfGrabbing;
+    public void OnTriggerEnter(Collider collider)
+    {
+        if(ObjectHandleInRangeOfGrabbing != null) return; // Already have something in range
+
+        // Only when reaching
+        if(Arm.CurrentState != RobotArmState.Reach) return;
+
+        var handle = collider.gameObject.GetComponent<GrabHandle>();
+        if(handle == null) return;
+
+        Debug.Log("Can grab");
+        ObjectHandleInRangeOfGrabbing = handle;
+        ObjectHandleInRangeOfGrabbing.MarkAsInRange();
+    }
+
+    public void OnTriggerStay(Collider collider)
+    {
+        OnTriggerEnter(collider);
+    }
+
+    public void OnTriggerExit(Collider collider)
+    {
+        var handle = collider.gameObject.GetComponent<GrabHandle>();
+        if(handle == null) return;
+        if(handle == ObjectHandleInRangeOfGrabbing)
+        {
+            Debug.Log("Clearing obj");
+            ObjectHandleInRangeOfGrabbing.MarkAsOutOfRange();
+            ObjectHandleInRangeOfGrabbing = null;
+        }
     }
 }
