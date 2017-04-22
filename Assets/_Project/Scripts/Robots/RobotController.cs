@@ -27,7 +27,7 @@ public class RobotController : MonoBehaviour
 			_robot.Claws.Open();
 			Arm.GotoState(RobotArmState.Reach);
 		}
-		else
+		else if(Arm.CurrentState != RobotArmState.Grabbing)
 		{
 			Arm.GotoState(RobotArmState.Idle);
 		}
@@ -50,6 +50,14 @@ public class RobotController : MonoBehaviour
 			if(Mathf.Abs(stick.x) > 0.0f)
 			{	
 				var rotation = transform.rotation * Quaternion.Euler(0f, stick.x * RotationSpeed / Time.deltaTime, 0f);
+				rotation = Quaternion.Euler(0f, rotation.eulerAngles.y, 0f);
+				_rigidbody.MoveRotation(rotation);
+			}
+			else
+			{
+				// make sure we don't tilt over
+				var rotation = transform.rotation;
+				rotation = Quaternion.Euler(0f, rotation.eulerAngles.y, 0f);
 				_rigidbody.MoveRotation(rotation);
 			}
 		}

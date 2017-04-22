@@ -20,7 +20,7 @@ public class RobotArm : MonoBehaviour
     private bool _transitioningState = false;
     private float _currentTransition;
 
-    public event Action<RobotArmState> StateChanged;
+    public event Action<RobotArmState, RobotArmState> StateChanged;
 
     void Start()
     {
@@ -90,7 +90,7 @@ public class RobotArm : MonoBehaviour
 
         if(StateChanged != null)
         {
-            StateChanged(_state.State);
+            StateChanged(_previousState.State, _state.State);
         }
         return true;
     }

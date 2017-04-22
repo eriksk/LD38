@@ -20,21 +20,32 @@ public class RobotClaws : MonoBehaviour
 
     void Start()
     {
-        Arm.StateChanged += ((state) => 
+        Arm.StateChanged += ((oldState, state) => 
         {
-            if(state != RobotArmState.Grabbing)
+            if(oldState == RobotArmState.Grabbing)
             {
-                if(ObjectHandleInRangeOfGrabbing != null)
-                {
-                    ObjectHandleInRangeOfGrabbing.MarkAsOutOfRange();
-                    ObjectHandleInRangeOfGrabbing = null;
-                }
+                ReleaseConnectedObject();
+            }
+
+            if(state == RobotArmState.Idle && ObjectHandleInRangeOfGrabbing != null)
+            {
+                // Grab it!
+                Arm.GotoState(RobotArmState.Grabbing);
+                GrabConnectedObject();
+            }
+            else if(state != RobotArmState.Grabbing && state != RobotArmState.Reach)
+            {
+                DetachInRangeHandle();
             }
         });
     }
 
-	void Update () 
+    void Update () 
 	{
+	}
+
+    void LateUpdate()
+    {
         if(LeftClaw == null || RightClaw == null) return;
 
         if(Application.isPlaying)
@@ -54,10 +65,6 @@ public class RobotClaws : MonoBehaviour
 
         LeftClaw.localRotation = Quaternion.Euler(0f, Mathf.Lerp(0f, -RotationRange, Opened), 0f);
         RightClaw.localRotation = Quaternion.Euler(0f, Mathf.Lerp(0f, RotationRange, Opened), 180f);
-	}
-
-    void LateUpdate()
-    {
         _opening = false;
     }
 
@@ -66,20 +73,58 @@ public class RobotClaws : MonoBehaviour
         _opening = true;
     }
 
+    [NonSerialized]
     public GrabHandle ObjectHandleInRangeOfGrabbing;
+
+    private void DetachInRangeHandle()
+    {
+        if(ObjectHandleInRangeOfGrabbing != null)
+        {
+            ObjectHandleInRangeOfGrabbing.MarkAsOutOfRange();
+        }
+        ObjectHandleInRangeOfGrabbing = null;
+    }
+
+    private void ConnectHandleInRange(GrabHandle handle)
+    {
+        // Detach previous if existing
+        DetachInRangeHandle();
+        ObjectHandleInRangeOfGrabbing = handle;
+        ObjectHandleInRangeOfGrabbing.MarkAsInRange();
+    }
+
+    private void GrabConnectedObject()
+    {
+        Debug.Log("Grabbing");
+        ObjectHandleInRangeOfGrabbing.Attach(transform);
+    }
+
+    private void ReleaseConnectedObject()
+    {
+        Debug.Log("Releasing");
+        var handles = transform.GetComponentsInChildren<GrabHandle>();
+        foreach(var handle in handles)
+        {
+            handle.Detach();
+        }
+    }
+
     public void OnTriggerEnter(Collider collider)
     {
-        if(ObjectHandleInRangeOfGrabbing != null) return; // Already have something in range
-
         // Only when reaching
-        if(Arm.CurrentState != RobotArmState.Reach) return;
+        if(Arm.CurrentState != RobotArmState.Reach) 
+        {
+            // If no longer reaching, detach.
+            DetachInRangeHandle();
+            return;
+        }
+
+        if(ObjectHandleInRangeOfGrabbing != null) return;
 
         var handle = collider.gameObject.GetComponent<GrabHandle>();
         if(handle == null) return;
 
-        Debug.Log("Can grab");
-        ObjectHandleInRangeOfGrabbing = handle;
-        ObjectHandleInRangeOfGrabbing.MarkAsInRange();
+        ConnectHandleInRange(handle);
     }
 
     public void OnTriggerStay(Collider collider)
@@ -93,9 +138,7 @@ public class RobotClaws : MonoBehaviour
         if(handle == null) return;
         if(handle == ObjectHandleInRangeOfGrabbing)
         {
-            Debug.Log("Clearing obj");
-            ObjectHandleInRangeOfGrabbing.MarkAsOutOfRange();
-            ObjectHandleInRangeOfGrabbing = null;
+            DetachInRangeHandle();
         }
     }
 }
