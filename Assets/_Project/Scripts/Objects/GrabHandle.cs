@@ -40,18 +40,19 @@ public class GrabHandle : MonoBehaviour
         _renderer.sharedMaterial = OutOfRangeMaterial;
     }
 
-    public void Attach(Transform transform)
+    public void Attach(Transform owner)
     {
-        Debug.Log("Attaching");
+        // TODO: move so handle is in position of the claw (owner)... dunno how!
+        // var clawTargetPosition = owner.InverseTransformPoint(transform.position);
+        // Root.position = clawTargetPosition;
         _originalParent = Root.parent;
-        Root.parent = transform;
+        Root.parent = owner;
         Rigidbody.isKinematic = true;
         _attached = true;
     }
 
     public void Detach()
     {
-        Debug.Log("Detaching");
         Root.parent = _originalParent;
         Rigidbody.isKinematic = false;
         _attached = false;

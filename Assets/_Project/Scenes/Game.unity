@@ -4435,8 +4435,8 @@ MonoBehaviour:
   Target: {fileID: 1265052163}
   Damping: 15
   MovementSpeed: 0.5
-  Distance: 75
-  Height: 45
+  Distance: 35
+  Height: 25
 --- !u!4 &1265052163 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4901669380574146, guid: 067b97e15724c49d1abe1babf5f03996,

@@ -95,13 +95,11 @@ public class RobotClaws : MonoBehaviour
 
     private void GrabConnectedObject()
     {
-        Debug.Log("Grabbing");
         ObjectHandleInRangeOfGrabbing.Attach(transform);
     }
 
     private void ReleaseConnectedObject()
     {
-        Debug.Log("Releasing");
         var handles = transform.GetComponentsInChildren<GrabHandle>();
         foreach(var handle in handles)
         {
