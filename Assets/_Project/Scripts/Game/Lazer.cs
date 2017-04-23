@@ -18,12 +18,15 @@ public class Lazer : MonoBehaviour
     private float _current;
     private BoxCollider _collider;
     private LineRenderer _lineRenderer;
+    private AudioSource _audioSource;
 
     void Start()
     {
         _collider = GetComponent<BoxCollider>();
         _lineRenderer = GetComponent<LineRenderer>();
         _lineRenderer.useWorldSpace = true;
+        _audioSource = GetComponent<AudioSource>();
+        _audioSource.pitch = UnityEngine.Random.Range(1.2f, 1.6f);
         Turn(on: true);
     }
 
@@ -86,6 +89,8 @@ public class Lazer : MonoBehaviour
         _current = 0;
         _collider.enabled = on;
         _lineRenderer.enabled = on;
+
+        _audioSource.volume = on ? 1f : 0f;
     }
 
     public void OnTriggerEnter(Collider collider)

@@ -25,6 +25,11 @@ public class RobotController : MonoBehaviour
 		_audioSource = GetComponent<AudioSource>();
 	}
 
+	void OnDisable()
+	{
+		_audioSource.volume = 0;
+	}
+
 	void Update()
 	{
 		if(Input.GetButton("Jump") || Input.GetMouseButton(0))
