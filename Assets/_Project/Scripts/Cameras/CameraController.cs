@@ -26,6 +26,7 @@ public class CameraController : MonoBehaviour
 	void Start () 
 	{
 		_currentOrbitDistance = Mathf.Lerp(OrbitDistance.x, OrbitDistance.y, 0.5f);
+		_y = 180;
 	}
 	
 	void Update () 

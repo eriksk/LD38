@@ -13,6 +13,8 @@ public class GameMenuActions : MonoBehaviour
     {
         foreach(var ac in Actions)
         {
+            if(Application.isEditor && ac.IgnoreInEditor) continue;
+            
             if(Input.GetButtonDown(ac.InputButton))
             {
                 ac.Event.Invoke();
@@ -26,4 +28,5 @@ public class KeyAction
 {
     public string InputButton;
     public UnityEvent Event;
+    public bool IgnoreInEditor = false;
 }

@@ -48,6 +48,7 @@ public class GrabHandle : MonoBehaviour
         _originalParent = Root.parent;
         Root.parent = owner;
         Rigidbody.isKinematic = true;
+        Root.GetComponent<Collider>().enabled = false;
         _attached = true;
     }
 
@@ -55,6 +56,10 @@ public class GrabHandle : MonoBehaviour
     {
         Root.parent = _originalParent;
         Rigidbody.isKinematic = false;
+        // Clear out existing forces
+        Rigidbody.velocity = Vector3.zero; 
+        Rigidbody.angularVelocity = Vector3.zero;
+        Root.GetComponent<Collider>().enabled = true;
         _attached = false;
     }
 }

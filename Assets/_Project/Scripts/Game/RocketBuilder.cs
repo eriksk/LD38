@@ -9,7 +9,19 @@ public class RocketBuilder : MonoBehaviour
     public List<Transform> ExpectedOrderOfObjects;
     public Transform HiddenRocketModel;
 
+    public TextMesh ProgressTextMesh;
+
     private int _current = 0;
+
+    void Start()
+    {
+        UpdateProgressText();
+    }
+
+    private void UpdateProgressText()
+    {
+        ProgressTextMesh.text = _current + " of 6 Rocket Parts";
+    }
 
     public bool TryAddObject(GameObject gameObject, Vector3 dropOffPoint)
     {
@@ -19,6 +31,7 @@ public class RocketBuilder : MonoBehaviour
         {
             StartCoroutine(MoveObjectIntoPlace(gameObject, dropOffPoint));
             _current++;
+            UpdateProgressText();
             return true;
         }
 
@@ -81,6 +94,9 @@ public class RocketBuilder : MonoBehaviour
 
         while(it.MoveNext())
             yield return it.Current;
+
+        // Hide the placeholder
+        target.gameObject.SetActive(false);
 
         Debug.Log(gameObject.name + " moved into place!");
     }

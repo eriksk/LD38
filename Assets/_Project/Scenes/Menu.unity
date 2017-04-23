@@ -38,12 +38,12 @@ RenderSettings:
   m_ReflectionIntensity: 0.64
   m_CustomReflection: {fileID: 8900000, guid: b995d4bd9d11078d11005b9844295342, type: 3}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 0.64}
+  m_IndirectSpecularColor: {r: 0.05187174, g: 0.050842308, b: 0.051641874, a: 0.64}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_GIWorkflowMode: 0
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -52,7 +52,7 @@ LightmapSettings:
     m_TemporalCoherenceThreshold: 1
     m_EnvironmentLightingMode: 0
     m_EnableBakedLightmaps: 0
-    m_EnableRealtimeLightmaps: 1
+    m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
     serializedVersion: 8
     m_Resolution: 2
@@ -462,7 +462,7 @@ Light:
     m_NearPlane: 0.2
   m_Cookie: {fileID: 0}
   m_DrawHalo: 1
-  m_Flare: {fileID: 12100000, guid: 09ebe82dbd1113c3d000dc0b8d76c639, type: 2}
+  m_Flare: {fileID: 12100000, guid: 54fbbf098d116effa00081aba8ad6659, type: 2}
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
