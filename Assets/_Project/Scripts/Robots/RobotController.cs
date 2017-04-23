@@ -24,7 +24,7 @@ public class RobotController : MonoBehaviour
 
 	void Update()
 	{
-		if(Input.GetButton("Jump"))
+		if(Input.GetButton("Jump") || Input.GetMouseButton(0))
 		{
 			_robot.Claws.Open();
 			Arm.GotoState(RobotArmState.Reach);

@@ -17,6 +17,7 @@ public class RobotClaws : MonoBehaviour
     public float OpenCloseSpeed = 0.1f;
     
     private bool _opening;
+    private float _cooldown;
 
     void Start()
     {
@@ -25,6 +26,7 @@ public class RobotClaws : MonoBehaviour
             if(oldState == RobotArmState.Grabbing)
             {
                 ReleaseConnectedObject();
+                _cooldown = 1f; // Can't grab anything else atm
             }
 
             if(state == RobotArmState.Idle && ObjectHandleInRangeOfGrabbing != null)
@@ -42,6 +44,7 @@ public class RobotClaws : MonoBehaviour
 
     void Update () 
 	{
+        _cooldown -= Time.deltaTime;
 	}
 
     void LateUpdate()
@@ -109,6 +112,8 @@ public class RobotClaws : MonoBehaviour
 
     public void OnTriggerEnter(Collider collider)
     {
+        if(_cooldown > 0f) return;
+        
         // Only when reaching
         if(Arm.CurrentState != RobotArmState.Reach) 
         {
