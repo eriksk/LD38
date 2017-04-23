@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RocketBuilder : MonoBehaviour
 {
@@ -12,6 +13,14 @@ public class RocketBuilder : MonoBehaviour
     public TextMesh ProgressTextMesh;
 
     private int _current = 0;
+
+    public GameObject NextExpected
+    {
+        get 
+        { 
+            return _current > ExpectedOrderOfObjects.Count - 1 ? null : ExpectedOrderOfObjects[_current].gameObject;
+        }
+    }
 
     void Start()
     {
@@ -99,6 +108,11 @@ public class RocketBuilder : MonoBehaviour
         target.gameObject.SetActive(false);
 
         Debug.Log(gameObject.name + " moved into place!");
+
+        if(NextExpected == null)
+        {
+            SceneManager.LoadScene("GameOver");
+        }
     }
 
     private IEnumerator MoveObject(Transform obj, Vector3 fromPosition, Quaternion fromRotation, Vector3 toPosition, Quaternion toRotation, float duration)

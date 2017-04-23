@@ -11,6 +11,7 @@ public class DropOffPoint : MonoBehaviour
     public RocketBuilder RocketBuilder;
 
     public GameObject SuccessPrefab;
+    public Transform RocketPartsContainer;
 
     public Material BaseMaterial, ErrorMaterial;
     private HashSet<int> _handled;
@@ -18,6 +19,21 @@ public class DropOffPoint : MonoBehaviour
     void Start()
     {
         _handled = new HashSet<int>();
+    }
+
+    public void CheatTeleportNextExpectedToLandingPad()
+    {
+        if(!Application.isPlaying) return; // Don't want to screw up in edit mode
+
+        var next = RocketBuilder.NextExpected;
+        if(next == null) return;
+
+        var name = next.name;
+
+        var obj = RocketPartsContainer.Children().FirstOrDefault(x => x.name == name);
+        if(obj == null) return;
+        obj.transform.position = transform.position + Vector3.up * 3f;
+
     }
 
     public void OnTriggerEnter(Collider collider)
