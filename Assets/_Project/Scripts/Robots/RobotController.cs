@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,11 +16,13 @@ public class RobotController : MonoBehaviour
 
 	private Rigidbody _rigidbody;
 	private Robot _robot;
+	private AudioSource _audioSource;
 
 	void Start()
 	{
 		_rigidbody = GetComponent<Rigidbody>();
 		_robot = GetComponent<Robot>();
+		_audioSource = GetComponent<AudioSource>();
 	}
 
 	void Update()
@@ -64,6 +67,7 @@ public class RobotController : MonoBehaviour
 			_rigidbody.MoveRotation(rotation);
 		}
 
+		ToggleWheelsAudio(moving);
 		ToggleTrailParticles(moving);
 
 		var velocity = _rigidbody.velocity;
@@ -75,7 +79,40 @@ public class RobotController : MonoBehaviour
 		}
 	}
 
-	private void ToggleTrailParticles(bool on)
+	private bool _wheelAudioOn;
+    private void ToggleWheelsAudio(bool moving)
+    {
+		if(_wheelAudioOn == moving) return;
+		_wheelAudioOn = moving;
+
+		if(moving)
+		{
+			StartCoroutine(QuickFade(_audioSource, 1f));
+		}
+		else
+		{
+			StartCoroutine(QuickFade(_audioSource, 0f));
+		}
+    }
+
+    private IEnumerator QuickFade(AudioSource audioSource, float volume)
+    {
+		var startVolume = audioSource.volume;
+
+		var duration = 0.5f;
+		var current = 0f;
+
+		while(current <= duration)
+		{
+			current += Time.deltaTime;
+			
+			var vol = Mathf.Lerp(startVolume, volume, current / duration);
+			audioSource.volume = vol;
+			yield return new WaitForEndOfFrame();
+		}
+    }
+
+    private void ToggleTrailParticles(bool on)
 	{
 		foreach(var ps in TrailsParticles)
 		{

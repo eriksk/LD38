@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 
@@ -15,6 +16,11 @@ public class RobotArm : MonoBehaviour
     public RobotArmState CurrentState;
 
     public float StateTransitionDuration = 1f;
+
+    [Header("Audio")]
+    public AudioSource OneShotSource;
+    public AudioClip BeginTransitionClip;
+
     private RobotArmStateTransformRotation _previousState;
     private RobotArmStateTransformRotation _state;
     private bool _transitioningState = false;
@@ -49,6 +55,25 @@ public class RobotArm : MonoBehaviour
 
         IsTransitioning = _transitioningState;
         CurrentState = _state.State;
+
+        ToggleArmSound(IsTransitioning);
+    }
+
+    private void ToggleArmSound(bool on)
+    {
+        var source = GetComponent<AudioSource>();
+        
+        if(source.isPlaying == on) return;
+
+        if(on)
+        {
+            source.UnPause();
+        }
+        else
+        {
+            source.Pause();
+            OneShotSource.PlayOneShot(BeginTransitionClip);
+        }
     }
 
     private void ApplyTransition(RobotArmStateTransformRotation previousState, RobotArmStateTransformRotation state, float progress)
@@ -92,6 +117,7 @@ public class RobotArm : MonoBehaviour
         {
             StateChanged(_previousState.State, _state.State);
         }
+
         return true;
     }
 }
