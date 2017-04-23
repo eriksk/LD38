@@ -15,6 +15,7 @@ public class CameraController : MonoBehaviour
 
 	[Header("Mouse Orbit")]
 	public bool MouseLook = false;
+	public bool InvertedMouse = true;
 	[Range(0f, 1f)]
 	public float MouseSmooth = 0.3f;
 	public float MouseSpeed = 50f;
@@ -39,6 +40,7 @@ public class CameraController : MonoBehaviour
 				Cursor.visible = false;
 			}
 			UpdateMouseLook();
+			FocusOnTarget();
 			return;
 		}
 
@@ -61,14 +63,32 @@ public class CameraController : MonoBehaviour
 		transform.position = Vector3.Lerp(transform.position, targetPosition, MovementSpeed * Time.fixedDeltaTime);
 	}
 
-	private float _x, _y;
+    private void FocusOnTarget()
+    {
+		var distance = Vector3.Distance(transform.position, Target.position);
+		var postfx = GetComponent<UnityEngine.PostProcessing.PostProcessingBehaviour>();
+		var settings = postfx.profile.depthOfField.settings;
+		settings.focusDistance = distance;
+		postfx.profile.depthOfField.settings = settings;
+    }
+
+    private float _x, _y;
 
     private void UpdateMouseLook()
     {
 		var mouseDelta = new Vector2(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"));
 
-		_x += mouseDelta.x * MouseSpeed * Time.fixedDeltaTime;
-		_y -= mouseDelta.y * MouseSpeed * Time.fixedDeltaTime;
+		if(InvertedMouse)
+		{
+			_x -= mouseDelta.x * MouseSpeed * Time.fixedDeltaTime;
+			_y += mouseDelta.y * MouseSpeed * Time.fixedDeltaTime;
+		}
+		else
+		{
+			_x += mouseDelta.x * MouseSpeed * Time.fixedDeltaTime;
+			_y -= mouseDelta.y * MouseSpeed * Time.fixedDeltaTime;
+		}
+
 
 		_x = Mathf.Clamp(_x, 50f, 80f);
 
@@ -81,5 +101,7 @@ public class CameraController : MonoBehaviour
 		transform.position = Vector3.Lerp(transform.position, finalPosition, 1f - MouseSmooth); // TODO: lerp
 
 		transform.LookAt(Target, Vector3.up);
+
+		FocusOnTarget();
     }
 }
